@@ -38,8 +38,8 @@ export const validateFullName = (fullName) => {
         return "Họ tên không được để trống";
     }
 
-    if (value.length < 2) {
-        return "Họ tên phải có ít nhất 2 ký tự";
+    if (value.length < 3) {
+        return "Họ tên phải có ít nhất 3 ký tự";
     }
 
     return "";
@@ -67,21 +67,77 @@ export const validatePassword = (password) => {
     return "";
 };
 
-export const validateRegisterForm = ({ fullName, email, phone, password }) => {
-    const errors = {};
+export const validateConfirmPassword = (password, confirmPassword) => {
+    const passwordValue = password.trim();
+    const confirmValue = confirmPassword.trim();
+
+    if (!confirmValue) {
+        return "Xác nhận mật khẩu không được để trống";
+    }
+
+    if (confirmValue !== passwordValue) {
+        return "Xác nhận mật khẩu không khớp";
+    }
+
+    return "";
+};
+
+export const validateRegisterForm = ({ fullName, email, phoneNumber, password, confirmPassword, isAcceptPolicy }) => {
+    const errors = [];
 
     const fullNameError = validateFullName(fullName);
     const emailError = validateEmail(email);
-    const phoneError = validatePhone(phone);
+    const phoneError = validatePhone(phoneNumber);
     const passwordError = validatePassword(password);
+    const confirmPasswordError = validateConfirmPassword(password, confirmPassword);
 
-    if (fullNameError) errors.fullName = fullNameError;
-    if (emailError) errors.email = emailError;
-    if (phoneError) errors.phone = phoneError;
-    if (passwordError) errors.password = passwordError;
+    if (fullNameError) {
+        errors.push({
+            errorName: "fullName",
+            message: fullNameError
+        });
+    }
+
+    if (emailError) {
+        errors.push({
+            errorName: "email",
+            message: emailError
+        });
+    }
+
+    if (phoneError) {
+        errors.push({
+            errorName: "phoneNumber",
+            message: phoneError
+        });
+    }
+
+    if (passwordError) {
+        errors.push({
+            errorName: "password",
+            message: passwordError
+        });
+    }
+
+    if (confirmPasswordError) {
+        errors.push({
+            errorName: "confirmPassword",
+            message: confirmPasswordError
+        });
+    }
+
+    if (isAcceptPolicy === false) {
+        errors.push(
+            {
+                errorName: "policy",
+                message: 'Bạn cần đồng ý chính sách và điều khoản để tiếp tục đăng ký'
+            }
+        )
+    }
 
     return errors;
 };
+
 
 export const validateLoginForm = ({ email, password }) => {
     const errors = [];

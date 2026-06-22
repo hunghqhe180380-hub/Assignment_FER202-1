@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import InputEmail from "../components/InputEmail"
 import InputPassword from "../components/InputPassword"
-import { validateLoginForm } from "../utils/validator"
+import { validateLoginForm } from "../ultils/validator"
 import axios from "axios"
 
 
@@ -36,7 +36,7 @@ const LoginPage = () => {
         const err = validateLoginForm(formData)
         if (err.length === 0) {
             const getData = await fetchData(formData)
-            const isLoginSuccess = getData.success
+            const isLoginSuccess = getData.success && getData.data.length > 0
 
             if (isLoginSuccess) {
                 navigate("/dashboard")

@@ -13,7 +13,7 @@ const InputConfirmPassword = ({ confirmPassword, setConfirmPassword, setShowConf
                     placeholder="Không giống không tính tiền hẹ hẹ hẹ..."
                     id="confirm-password-input-login"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => setConfirmPassword(e.target.value.trim())}
                     required></input>
                 <InputGroup.Text
                     onClick={() => setShowConfirmPassword((prev) => !prev)}>

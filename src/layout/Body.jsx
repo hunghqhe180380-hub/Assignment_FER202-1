@@ -9,7 +9,7 @@ const Body = () => {
     const navigate = useNavigate()
 
     return (
-        <div className="px-3 d-flex justify-content-center align-items-center min-vh-100">
+        <div className="px-3 d-flex justify-content-center align-items-center min-vh-100 ">
             <div className='w-100'>
                 <Row className="text-center">
                     <h1 className="subTitle">Quản lý danh bạ cá nhân dễ dàng</h1>
