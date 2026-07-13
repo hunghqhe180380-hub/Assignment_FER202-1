@@ -1,34 +1,139 @@
 {
   "users": [
     {
-      "id": 1,
-      "fullName": "HenryHoang",
-      "email": "hung231004@gmail.com",
-      "phoneNumber": "0123456789",
-      "password": "123456"
-    },
-    {
-      "id": 2,
-      "fullName": "HenryHoang",
-      "email": "test1@gmail.com",
-      "phoneNumber": "0123456789",
-      "password": "123456"
-    },
-    {
-      "id": 3,
-      "fullName": "HenryHoang",
-      "email": "test2@gmail.com",
-      "phoneNumber": "0123456789",
-      "password": "123456"
-    },
-    {
       "fullName": "Nguyễn Văn A",
-      "email": "student@gmail.com",
+      "email": "hunghoang042310a5@gmail.com",
       "phoneNumber": "0323456789",
       "password": "123456",
       "confirmPassword": "123456",
       "isAcceptPolicy": true,
-      "id": 4
+      "id": 1
+    }
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "name": "Gia đình"
+    },
+    {
+      "id": 2,
+      "name": "Bạn bè"
+    },
+    {
+      "id": 3,
+      "name": "Công việc"
+    },
+    {
+      "id": 4,
+      "name": "Khác"
+    }
+  ],
+  "contacts": [
+    {
+      "id" : 1,
+      "userId": 1,
+      "data": [
+  {
+    "id": 1,
+    "fullName": "Nguyễn Văn An",
+    "phoneNumber": "0387291833",
+    "email": "nguyenan334@gmail.com",
+    "groupId": 1,
+    "isFavourite": 1,
+    "createdAt": "2026-07-12T17:00:00.000Z",
+    "updatedAt": "2026-07-12T17:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "fullName": "Trần Thị Bình",
+    "phoneNumber": "0912345678",
+    "email": "tranthibinh@gmail.com",
+    "groupId": 2,
+    "isFavourite": 0,
+    "createdAt": "2026-07-12T18:10:00.000Z",
+    "updatedAt": "2026-07-12T18:10:00.000Z"
+  },
+  {
+    "id": 3,
+    "fullName": "Lê Minh Cường",
+    "phoneNumber": "0987654321",
+    "email": "leminhcuong@gmail.com",
+    "groupId": 3,
+    "isFavourite": 1,
+    "createdAt": "2026-07-12T19:20:00.000Z",
+    "updatedAt": "2026-07-12T19:20:00.000Z"
+  },
+  {
+    "id": 4,
+    "fullName": "Phạm Thu Dung",
+    "phoneNumber": "0378456123",
+    "email": "phamthudung@gmail.com",
+    "groupId": 1,
+    "isFavourite": 0,
+    "createdAt": "2026-07-13T01:15:00.000Z",
+    "updatedAt": "2026-07-13T01:15:00.000Z"
+  },
+  {
+    "id": 5,
+    "fullName": "Hoàng Đức Anh",
+    "phoneNumber": "0869123456",
+    "email": "hoangducanh@gmail.com",
+    "groupId": 4,
+    "isFavourite": 1,
+    "createdAt": "2026-07-13T02:30:00.000Z",
+    "updatedAt": "2026-07-13T02:30:00.000Z"
+  },
+  {
+    "id": 6,
+    "fullName": "Vũ Ngọc Hà",
+    "phoneNumber": "0334567890",
+    "email": "vungocha@gmail.com",
+    "groupId": 2,
+    "isFavourite": 0,
+    "createdAt": "2026-07-13T03:45:00.000Z",
+    "updatedAt": "2026-07-13T03:45:00.000Z"
+  },
+  {
+    "id": 7,
+    "fullName": "Đỗ Quang Huy",
+    "phoneNumber": "0978123456",
+    "email": "doquanghuy@gmail.com",
+    "groupId": 3,
+    "isFavourite": 1,
+    "createdAt": "2026-07-13T04:20:00.000Z",
+    "updatedAt": "2026-07-13T04:20:00.000Z"
+  },
+  {
+    "id": 8,
+    "fullName": "Bùi Thanh Hương",
+    "phoneNumber": "0567891234",
+    "email": "buithanhhuong@gmail.com",
+    "groupId": 1,
+    "isFavourite": 0,
+    "createdAt": "2026-07-13T05:10:00.000Z",
+    "updatedAt": "2026-07-13T05:10:00.000Z"
+  },
+  {
+    "id": 9,
+    "fullName": "Ngô Tuấn Kiệt",
+    "phoneNumber": "0945123786",
+    "email": "ngotuankiet@gmail.com",
+    "groupId": 4,
+    "isFavourite": 1,
+    "createdAt": "2026-07-13T06:05:00.000Z",
+    "updatedAt": "2026-07-13T06:05:00.000Z"
+  },
+  {
+    "id": 10,
+    "fullName": "Đặng Hoàng Lan",
+    "phoneNumber": "0834567129",
+    "email": "danghoanglan@gmail.com",
+    "groupId": 2,
+    "isFavourite": 0,
+    "createdAt": "2026-07-13T07:00:00.000Z",
+    "updatedAt": "2026-07-13T07:00:00.000Z"
+  }
+]
     }
   ]
 }

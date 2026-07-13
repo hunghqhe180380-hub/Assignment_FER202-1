@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const validateEmail = (email) => {
     const value = email.trim();
 
@@ -82,9 +84,9 @@ export const validateConfirmPassword = (password, confirmPassword) => {
     return "";
 };
 
-export const validateRegisterForm = ({ fullName, email, phoneNumber, password, confirmPassword, isAcceptPolicy }) => {
+export const validateRegisterForm = async ({ fullName, email, phoneNumber, password, confirmPassword, isAcceptPolicy }) => {
     const errors = [];
-
+    const API = import.meta.env.VITE_API_BASE_URL;
     const fullNameError = validateFullName(fullName);
     const emailError = validateEmail(email);
     const phoneError = validatePhone(phoneNumber);
@@ -103,6 +105,18 @@ export const validateRegisterForm = ({ fullName, email, phoneNumber, password, c
             errorName: "email",
             message: emailError
         });
+    } else {
+        try {
+            const isExistEmail = await axios.get(`${API}/users?email=${email}`)
+            if (isExistEmail.data.length > 0) {
+                errors.push({
+                    errorName: 'email',
+                    message: 'Email đã tồn tại'
+                })
+            }
+        } catch (error) {
+            console.error(error.message)
+        }
     }
 
     if (phoneError) {
@@ -110,6 +124,18 @@ export const validateRegisterForm = ({ fullName, email, phoneNumber, password, c
             errorName: "phoneNumber",
             message: phoneError
         });
+    } else {
+        try {
+            const isExistPhone = await axios.get(`${API}/users?phone=${phoneNumber}`)
+            if (isExistPhone.data.length > 0) {
+                errors.push({
+                    errorName: 'phoneNumber',
+                    message: 'Phone number đã tồn tại'
+                })
+            }
+        } catch (error) {
+            console.error(error.message)
+        }
     }
 
     if (passwordError) {
@@ -159,3 +185,9 @@ export const validateLoginForm = ({ email, password }) => {
     );
     return errors;
 };
+
+// const API = import.meta.env.VITE_API_BASE_URL
+// export const hasAccount = async ({ email, phone }) => {
+//     const error = [];
+
+// }

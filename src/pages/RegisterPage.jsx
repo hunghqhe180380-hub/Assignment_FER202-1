@@ -52,7 +52,7 @@ const RegisterPage = () => {
             confirmPassword: confirmPassword,
             isAcceptPolicy: isAcceptPolicy
         }
-        const err = validateRegisterForm(formRegister)
+        const err = await validateRegisterForm(formRegister)
 
         if (err.length > 0) {
             setErrors(err)
@@ -99,7 +99,6 @@ const RegisterPage = () => {
                 message: 'Register Successfully',
                 data: res.data
             }
-
         } catch (error) {
             return {
                 success: false,

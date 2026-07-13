@@ -42,7 +42,9 @@ const LoginPage = () => {
             const isLoginSuccess = getData.success && getData.data.length > 0
 
             if (isLoginSuccess) {
-                navigate("/dashboard")
+                //_____Save user's info into local storage
+                localStorage.setItem("user", JSON.stringify({ id: getData.data[0].id, fullName: getData.data[0].fullName }))
+                navigate("/dashboard?tab=contacts")
             } else {
                 setErrors([
                     {
