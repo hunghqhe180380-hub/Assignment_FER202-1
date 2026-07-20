@@ -5,9 +5,9 @@ import InputFullName from './InputFullName';
 import InputPhoneNumber from './InputPhoneNumber';
 import InputEmail from './InputEmail';
 import axios from 'axios';
-import { validateEditOrUpdateForm } from '../ultils/validator';
+import { findDuplicatePhonesInContacts, parsePhoneNumbers, validateEditOrUpdateForm } from '../ultils/validator';
 
-const ModalAddContact = ({ isOpenAddContactModal, setIsOpenAddContactModal, isAddContact, setIsAddContact, contactsRaw }) => {
+const ModalAddContact = ({ isOpenAddContactModal, setIsOpenAddContactModal, setReload, contactsRaw }) => {
 
     // State
     const [fullName, setFullName] = useState('')
@@ -30,53 +30,57 @@ const ModalAddContact = ({ isOpenAddContactModal, setIsOpenAddContactModal, isAd
 
         try {
             // get new id
-            const newId = contactsRaw.toSorted((a, b) => b.id - a.id)[0].id + 1;
+            const newId = contactsRaw.length === 0
+                ? 1
+                : contactsRaw.toSorted((a, b) => b.id - a.id)[0].id + 1
             // console.log(maxId)
+            const parsedPhoneNumbers = parsePhoneNumbers(phoneNumber)
             const newContact = {
                 id: newId,
                 fullName: fullName,
-                phoneNumber: phoneNumber,
+                phoneNumber: parsedPhoneNumbers,
                 email: email,
                 groupId: groupId,
                 isFavourite: 0,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             }
-            //_______Validation_______________________________________________________________________________________
-            if (validateEditOrUpdateForm(newContact).length === 0) {
-                // setErrors =([]) to reset state
+
+            const validationErrors = validateEditOrUpdateForm(newContact)
+            if (validationErrors.length === 0) {
                 setErrors([])
-                // check duplicate contact (phone, email) => contact can has the same name
                 const contactToValidate = contactsRaw
-                const isDuplicateEmail = contactToValidate.find((contact) => contact.email === email)
-                const isDuplicatePhoneNumber = contactToValidate.find((contact) => contact.phoneNumber === phoneNumber)
-                // If info is duplicate => display errors and return
+                const isDuplicateEmail = contactToValidate.find((contact) => contact.email === email.trim())
+                const duplicatePhones = findDuplicatePhonesInContacts(phoneNumber, contactToValidate)
+
                 if (isDuplicateEmail) {
                     setErrors(prevErrors => [
                         ...prevErrors.filter(error => error.errorName !== 'email'),
-                        { errorName: 'email', message: `Email này đã được lưu cho ${isDuplicateEmail.fullName}. Vui lòng kiểm tra lại!` }])
+                        { errorName: 'email', message: `Email này đã được lưu cho ${isDuplicateEmail.fullName.trim()}. Vui lòng kiểm tra lại!` }])
                 }
-                if (isDuplicatePhoneNumber) {
+                if (duplicatePhones.length > 0) {
                     setErrors(prevErrors => [
                         ...prevErrors.filter(error => error.errorName !== 'phone'),
                         {
                             errorName: 'phone',
-                            message: `Số điện thoại này đã được lưu cho ${isDuplicatePhoneNumber.fullName}. Vui lòng kiểm tra lại!`
+                            message: duplicatePhones
+                                .map(({ phone, contactName }) => `Số ${phone} đã được lưu cho ${contactName}`)
+                                .join(". ")
                         }
                     ]);
                 }
-                if (!isDuplicateEmail && !isDuplicatePhoneNumber) {
+                if (!isDuplicateEmail && duplicatePhones.length === 0) {
                     // updated contacts
                     const updatedContacts = [...contactsRaw, newContact]
                     console.log(updatedContacts)
                     await axios.patch(`http://localhost:9999/contacts/${user.id}`, { data: updatedContacts })
-                    setIsAddContact((prev) => !prev)
+                    setReload((prev) => prev + 1)
                     // close modal
                     setIsOpenAddContactModal((prev) => !prev)
                     setErrors([])
                 }
             } else {
-                setErrors(validateEditOrUpdateForm(newContact))
+                setErrors(validationErrors)
             }
         } catch (error) {
             console.log(error.message)

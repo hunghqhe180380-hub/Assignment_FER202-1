@@ -6,10 +6,7 @@ import ModalAddContact from "../components/ModalAddContact"
 import axios from "axios"
 
 const TableContact = ({
-    isChangeStar, setIsChangeStar,
-    isDeleted, setIsDeleted,
-    isEdited, setIsEdited,
-    isAddContact, setIsAddContact,
+    setReload,
     setContacts,
     contactsRaw,
     itemsPagination,
@@ -42,7 +39,7 @@ const TableContact = ({
     //___Sort by name
     const [isSorted, setIsSorted] = useState(false)
     const handleSortedName = (e) => {
-        e.preventDefault
+        e.preventDefault()
         if (isSorted === true) {
             const arr = contactsRaw.toSorted((a, b) => {
                 const arrLengthName = a.fullName.split(" ").length
@@ -102,10 +99,10 @@ const TableContact = ({
             }
             :
             c)
-        await axios.patch(` http://localhost:9999/contacts/${user.id}`, {
+        await axios.patch(`http://localhost:9999/contacts/${user.id}`, {
             data: newDatasToUpdated
         })
-        setIsChangeStar((prev) => !prev)
+        setReload((prev) => prev + 1)
         setSelectedContactEdit(contact)
     }
 
@@ -175,7 +172,7 @@ const TableContact = ({
                                 <tr>
                                     <td className="fw-bold">{contact.id}</td>
                                     <td>{contact.fullName}</td>
-                                    <td>{contact.phoneNumber}</td>
+                                    <td>{contact.phoneNumber.map((phone) => <div>{phone}</div>)}</td>
                                     <td>{contact.email}</td>
                                     <td>{formatGroup(contact.groupId)}</td>
                                     <td className="text-center">
@@ -229,20 +226,18 @@ const TableContact = ({
                 setIsOpenModalDelete={setIsOpenModalDelete}
                 contactsRaw={contactsRaw}
                 selectedDelete={selectedContactEdit}
-                setIsDeleted={setIsDeleted}
+                setReload={setReload}
             >
             </ModalDelete>
             <ModalEdit
-                isEdited={isEdited}
-                setIsEdited={setIsEdited}
+                setReload={setReload}
                 contactsRaw={contactsRaw}
                 isOpenModalEdit={isOpenModalEdit}
                 setIsOpenModalEdit={setIsOpenModalEdit}
                 selectedContactEdit={selectedContactEdit}>
             </ModalEdit>
             <ModalAddContact
-                isAddContact={isAddContact}
-                setIsAddContact={setIsAddContact}
+                setReload={setReload}
                 contactsRaw={contactsRaw}
                 isOpenAddContactModal={isOpenAddContactModal}
                 setIsOpenAddContactModal={setIsOpenAddContactModal}>

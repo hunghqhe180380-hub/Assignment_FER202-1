@@ -8,12 +8,12 @@ const InputPhoneNumber = ({ phoneNumber, setPhoneNumber }) => {
                 <InputGroup.Text>
                     <i className="bi bi-telephone"></i>
                 </InputGroup.Text>
-                <input type={`text`}
-                    className={`form-control`}
-                    placeholder="0123456789"
+                <input type="text"
+                    className="form-control"
+                    placeholder="0123456789 0987654321 (cách nhau bởi dấu cách)"
                     id="phone-input-login"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.trim())}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     required></input>
             </InputGroup>
         </Row>

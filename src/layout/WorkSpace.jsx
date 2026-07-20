@@ -1,45 +1,43 @@
-import { Card, Pagination, Table } from "react-bootstrap"
 import ListCard from "./ListCard"
 import TableContact from "./TableContact"
-import { useAsyncError, useSearchParams } from "react-router-dom"
+import TableTrash from "./TableTrash"
+import { useSearchParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import SettingProfile from "../pages/SettingProfile"
 
 const WorkSpace = () => {
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const tab = searchParams.get("tab")
 
     const [error, setError] = useState()
     const user = JSON.parse(localStorage.getItem("user"))
     // State
     const [contacts, setContacts] = useState([])
+    const [trashContacts, setTrashContacts] = useState([])
     const [groups, setGroups] = useState([])
-    //_State is edited?
-    const [isEdited, setIsEdited] = useState(false)
-    //_State is Add contact?
-    const [isAddContact, setIsAddContact] = useState(false)
-    //_State is Delete contact?
-    const [isDeleted, setIsDeleted] = useState(false)
-    //_State is Change Favourite (click star) ?
-    const [isChangeStar, setIsChangeStar] = useState(false)
-    // Fetch data
+    // Tăng reload mỗi khi thêm / sửa / xóa / khôi phục / đổi yêu thích → useEffect fetch lại data
+    const [reload, setReload] = useState(0)
+
+    // Fetch data mới nhất khi reload thay đổi
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [resContacts, resGroups] = await Promise.all([
+                const [resContacts, resGroups, resTrash] = await Promise.all([
                     axios.get(`http://localhost:9999/contacts/${user.id}`),
-                    axios.get('http://localhost:9999/groups')
+                    axios.get('http://localhost:9999/groups'),
+                    axios.get(`http://localhost:9999/trash/${user.id}`)
                 ])
                 setContacts(resContacts.data.data)
                 setGroups(resGroups.data)
+                setTrashContacts(resTrash.data.data || [])
             } catch (err) {
                 setError(err.message)
                 return;
             }
         }
         fetchData()
-    }, [isEdited, isAddContact, isDeleted, isChangeStar])
+    }, [reload])
 
     // filter
     const [selectedGroup, setSelectedGroup] = useState('all');
@@ -80,14 +78,7 @@ const WorkSpace = () => {
                     </ListCard>
                     {/*____Table Contact_____ */}
                     <TableContact
-                        isChangeStar={isChangeStar}
-                        setIsChangeStar={setIsChangeStar}
-                        isDeleted={isDeleted}
-                        setIsDeleted={setIsDeleted}
-                        isEdited={isEdited}
-                        setIsEdited={setIsEdited}
-                        isAddContact={isAddContact}
-                        setIsAddContact={setIsAddContact}
+                        setReload={setReload}
                         itemsPagination={itemsPagination}
                         contacts={currenContacts}
                         contactsRaw={contacts}
@@ -102,6 +93,15 @@ const WorkSpace = () => {
                         searchName={searchName}
                         setSearchName={setSearchName}>
                     </TableContact>
+                </>
+            }
+            {tab === 'trash'
+                && <>
+                    <TableTrash
+                        trashContacts={trashContacts}
+                        contactsRaw={contacts}
+                        setReload={setReload}
+                    />
                 </>
             }
             {tab === "setting"

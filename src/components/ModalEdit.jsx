@@ -6,9 +6,9 @@ import InputEmail from './InputEmail';
 import { Accordion } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { validateEditOrUpdateForm } from '../ultils/validator';
+import { findDuplicatePhonesInContacts, parsePhoneNumbers, validateEditOrUpdateForm } from '../ultils/validator';
 
-const ModalEdit = ({ contactsRaw, isOpenModalEdit, setIsOpenModalEdit, selectedContactEdit, setIsEdited }) => {
+const ModalEdit = ({ contactsRaw, isOpenModalEdit, setIsOpenModalEdit, selectedContactEdit, setReload }) => {
     // const selectedContactId = selectedContactEdit.id
     const [fullName, setFullName] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
@@ -19,7 +19,11 @@ const ModalEdit = ({ contactsRaw, isOpenModalEdit, setIsOpenModalEdit, selectedC
         if (!selectedContactEdit) return;
 
         setFullName(selectedContactEdit.fullName ?? '');
-        setPhoneNumber(selectedContactEdit.phoneNumber ?? '');
+        setPhoneNumber(
+            Array.isArray(selectedContactEdit.phoneNumber)
+                ? selectedContactEdit.phoneNumber.join(" ")
+                : (selectedContactEdit.phoneNumber ?? '')
+        );
         setEmail(selectedContactEdit.email ?? '');
         setGroupId(selectedContactEdit.groupId ?? 4);
         setErrors([]);
@@ -30,40 +34,44 @@ const ModalEdit = ({ contactsRaw, isOpenModalEdit, setIsOpenModalEdit, selectedC
     const [errors, setErrors] = useState([])
     // handle edit
     const updatedContact = async () => {
+        const parsedPhoneNumbers = parsePhoneNumbers(phoneNumber)
         const newInfor = {
             id: selectedContactEdit.id,
             fullName: fullName,
-            phoneNumber: phoneNumber,
+            phoneNumber: parsedPhoneNumbers,
             email: email,
             groupId: groupId
         }
 
         const userLogin = JSON.parse(localStorage.getItem("user"))
-        // Update new contact's info
-        if (validateEditOrUpdateForm(newInfor).length === 0) {
-            // setErrors =([]) to reset state
+        const validationErrors = validateEditOrUpdateForm(newInfor)
+        if (validationErrors.length === 0) {
             setErrors([])
-            // check duplicate contact (phone, email) => contact can has the same name
             const contactToValidate = contactsRaw.filter((contact) => contact.id !== selectedContactEdit.id)
-            const isDuplicateEmail = contactToValidate.find((contact) => contact.email === email)
-            const isDuplicatePhoneNumber = contactToValidate.find((contact) => contact.phoneNumber === phoneNumber)
-            // If info is duplicate => display errors and return
+            const isDuplicateEmail = contactToValidate.find((contact) => contact.email === email.trim())
+            const duplicatePhones = findDuplicatePhonesInContacts(
+                phoneNumber,
+                contactToValidate,
+                selectedContactEdit.id
+            )
+
             if (isDuplicateEmail) {
                 setErrors(prevErrors => [
                     ...prevErrors.filter(error => error.errorName !== 'email'),
-                    { errorName: 'email', message: `Email này đã được lưu cho ${isDuplicateEmail.fullName}. Vui lòng kiểm tra lại!` }])
+                    { errorName: 'email', message: `Email này đã được lưu cho ${isDuplicateEmail.fullName.trim()}. Vui lòng kiểm tra lại!` }])
             }
-            if (isDuplicatePhoneNumber) {
+            if (duplicatePhones.length > 0) {
                 setErrors(prevErrors => [
                     ...prevErrors.filter(error => error.errorName !== 'phone'),
                     {
                         errorName: 'phone',
-                        message: `Số điện thoại này đã được lưu cho ${isDuplicatePhoneNumber.fullName}. Vui lòng kiểm tra lại!`
+                        message: duplicatePhones
+                            .map(({ phone, contactName }) => `Số ${phone} đã được lưu cho ${contactName}`)
+                            .join(". ")
                     }
                 ]);
             }
-            // if not duplicate => allow to update
-            if (!isDuplicateEmail && !isDuplicatePhoneNumber) {
+            if (!isDuplicateEmail && duplicatePhones.length === 0) {
                 // new contacts info to update
                 const updatedContacts = contactsRaw.map((contact) => Number(contact.id) === Number(selectedContactEdit.id)
                     ? {
@@ -81,11 +89,11 @@ const ModalEdit = ({ contactsRaw, isOpenModalEdit, setIsOpenModalEdit, selectedC
                 }
                 // close modal
                 setIsOpenModalEdit(false)
-                // setIsEdited to fetch data again at parent component
-                setIsEdited((prev) => !prev)
+                // Tăng reload để WorkSpace useEffect fetch lại data mới nhất
+                setReload((prev) => prev + 1)
             }
         } else {
-            setErrors(validateEditOrUpdateForm(newInfor))
+            setErrors(validationErrors)
         }
 
     }

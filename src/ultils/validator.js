@@ -126,7 +126,7 @@ export const validateRegisterForm = async ({ fullName, email, phoneNumber, passw
         });
     } else {
         try {
-            const isExistPhone = await axios.get(`${API}/users?phone=${phoneNumber}`)
+            const isExistPhone = await axios.get(`${API}/users?phoneNumber=${phoneNumber}`)
             if (isExistPhone.data.length > 0) {
                 errors.push({
                     errorName: 'phoneNumber',
@@ -186,33 +186,103 @@ export const validateLoginForm = ({ email, password }) => {
     return errors;
 };
 
+export const parsePhoneNumbers = (phoneInput) => {
+    if (Array.isArray(phoneInput)) {
+        return phoneInput.map((phone) => phone.trim()).filter((phone) => phone.length > 0);
+    }
+
+    return phoneInput.trim().split(/\s+/).filter((phone) => phone.length > 0);
+};
+
+export const validatePhoneNumbers = (phoneInput) => {
+    const phones = parsePhoneNumbers(phoneInput);
+
+    if (phones.length === 0) {
+        return "Số điện thoại không được để trống";
+    }
+
+    const invalidMessages = phones
+        .map((phone) => {
+            const error = validatePhone(phone);
+            if (error && error !== "Số điện thoại không được để trống") {
+                return `${phone}: ${error}`;
+            }
+            return "";
+        })
+        .filter(Boolean);
+
+    if (invalidMessages.length > 0) {
+        return invalidMessages.join("; ");
+    }
+
+    const duplicatePhones = phones.filter((phone, index) => phones.indexOf(phone) !== index);
+    const uniqueDuplicates = [...new Set(duplicatePhones)];
+
+    if (uniqueDuplicates.length > 0) {
+        return `Số điện thoại bị trùng lặp trong danh sách: ${uniqueDuplicates.join(", ")}`;
+    }
+
+    return "";
+};
+
+export const findDuplicatePhonesInContacts = (phoneInput, contacts, excludeContactId = null) => {
+    const phones = parsePhoneNumbers(phoneInput);
+    const duplicates = [];
+
+    phones.forEach((phone) => {
+        const contactWithPhone = contacts.find((contact) => {
+            if (excludeContactId !== null && Number(contact.id) === Number(excludeContactId)) {
+                return false;
+            }
+
+            const contactPhones = Array.isArray(contact.phoneNumber)
+                ? contact.phoneNumber
+                : [contact.phoneNumber];
+
+            return contactPhones.includes(phone);
+        });
+
+        if (contactWithPhone) {
+            duplicates.push({
+                phone,
+                contactName: contactWithPhone.fullName.trim()
+            });
+        }
+    });
+
+    return duplicates;
+};
+
 export const validateEditOrUpdateForm = ({ fullName, phoneNumber, email }) => {
     const errors = [];
 
-    const fullNameError = validateFullName(fullName)
+    const fullNameError = validateFullName(fullName);
     const emailError = validateEmail(email);
-    const phoneError = validatePhone(phoneNumber);
+    const phoneError = validatePhoneNumbers(phoneNumber);
 
-    if (emailError) errors.push(
-        {
-            errorName: 'email',
-            message: emailError
-        }
-    );
-    if (phoneError) errors.push(
-        {
-            errorName: 'phone',
-            message: phoneError
-        }
-    );
-    if (fullNameError) errors.push(
-        {
-            errorName: 'fullName',
+    if (fullNameError) {
+        errors.push({
+            errorName: "fullName",
             message: fullNameError
-        }
-    );
+        });
+    }
+
+    if (emailError) {
+        errors.push({
+            errorName: "email",
+            message: emailError
+        });
+    }
+
+    if (phoneError) {
+        errors.push({
+            errorName: "phone",
+            message: phoneError
+        });
+    }
+
     return errors;
-}
+};
 // const API = import.meta.env.VITE_API_BASE_URL
 // export const hasAccount = async ({ email, phone }) => {
 //     const error = [];

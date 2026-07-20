@@ -48,13 +48,13 @@ const Tabbar = () => {
                 <span className="text-item-logo">Yêu thích</span>
             </div> */}
             {/*________Thùng rác__________________________ */}
-            {/* <div className="tabbar_item" style={tab === 'trash' ? ITEM_SELECTED : {}}
+            <div className="tabbar_item" style={tab === 'trash' ? ITEM_SELECTED : {}}
                 onClick={() => setSearchParams("tab=trash")}>
                 <div>
                     <i className="tabbar_item_logo bi bi-trash"></i>
                 </div>
                 <span className="text-item-logo">Thùng rác</span>
-            </div> */}
+            </div>
             <hr />
             <div className="tabbar_item" style={tab === 'setting' ? ITEM_SELECTED : {}}
                 onClick={() => setSearchParams("tab=setting")}>
